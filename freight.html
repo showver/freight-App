@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+        <h1 style="text-align:center;">极客鲜生——运费计算app</h1>
+        <p style="text-align:center;padding:8px 0;">货物重量：
+            <input type="number" id="zhongliang" name="points" value="7" min="1" max="25" style="width:20%;margin:0 5px;">公斤/kg
+            
+            <span style="margin-left:10px;border:1px;" onclick="refresh()">查询</span>
+        </p>
+        <p style="color:red;text-align:center;">注意：美团、饿了么，最大配送重量为20kg</p>
+       <div id="container" style="width:90%;height: 50vh;margin:0 auto;"></div>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+       <script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+option = {
+    title: {
+        text: '同城配送——费用'
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['闪送', '达达', 'uu跑腿', '美团', '饿了么']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    xAxis: {
+        name: '公里/kg',
+        type: 'category',
+        data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+    },
+    yAxis: {
+        name: '费用/元',
+        type: 'value'
+    },
+    series: [
+        {
+            name:'闪送',
+            type:'line',
+            step: 'start',
+            data:[]
+        },
+        {
+            name:'达达',
+            type:'line',
+            // step: 'start',
+            data:[]
+        },
+        {
+            name:'uu跑腿',
+            type:'line',
+            // step: 'bottom',
+            data:[]
+        },
+        {
+            name:'美团',
+            type:'line',
+            // step: 'bottom',
+            data:[]
+        },
+        {
+            name:'饿了么',
+            type:'line',
+            // step: 'bottom',
+            data:[]
+        },
+    ]
+};
+;
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+
+
+
+var init_xAxis = []
+for(let i=0; i<100; i++) {
+    init_xAxis[i] = i+1;
+}
+console.log(init_xAxis)
+
+
+var shansong = [];
+var dada = []
+var uupaotui = []
+var meituan = []
+var eleme = []
+var shansong_init_price = 18
+var meituan_init_price = 10
+var dada_init_price = 10
+var uupaotui_init_price = 18
+var eleme_init_price = 6
+function refresh() {
+    if(!myChart){
+        return;
+    }
+    //更新数据
+    var option = myChart.getOption();
+    option.series[0].data = shansong; 
+    option.series[1].data = dada; 
+    option.series[2].data = uupaotui; 
+    option.series[3].data = meituan; 
+    option.series[4].data = eleme; 
+    myChart.setOption(option, true);    
+}
+
+
+window.onload = function(){
+    var kg_number = document.getElementById("zhongliang").value
+
+    // 初始化"闪送"起步价
+    if( kg_number>=6 ) shansong_init_price += (kg_number-5)*2
+    for(let i=0; i<3; i++){
+        shansong[i] = shansong_init_price
+    }
+    for(let i=3; i<8; i++){
+        shansong[i] = shansong_init_price + (i-2)*3
+    }
+    for(let i=8; i<18; i++){
+        shansong[i] = shansong_init_price + 15 + Math.ceil((i-7)/2)*3
+    }
+    for(let i=18; i<50; i++){
+        shansong[i] = shansong_init_price + 15 + 15 + Math.ceil((i-17)/3)*6
+    }
+    console.log('闪送起步价',shansong_init_price)
+    console.log('闪送',shansong)
+
+    // 初始化“达达”起步价
+    if( kg_number>=6 ) dada_init_price += (kg_number-5)*2
+    dada[0] = dada_init_price
+    for(let i=1; i<3; i++){
+        dada[i] = dada_init_price + i
+    }
+    for(let i=3; i<7; i++){
+        dada[i] = dada_init_price + 2 + (i-2)*2
+    }
+    for(let i=7; i<10; i++){
+        dada[i] = dada_init_price + 2 + 8 + (i-6)*3
+    }
+    for(let i=10; i<16; i++){
+        dada[i] = dada_init_price + 2 + 8 + 9 + Math.ceil((i-9)/3)*4
+    }
+    for(let i=16; i<50; i++){
+        dada[i] = dada_init_price + 2 + 8 + 9 + 8 + Math.ceil((i-15)/3)*6
+    }
+    console.log('达达起步价',dada_init_price)
+    console.log('达达',dada)
+    
+    // 初始化“uu跑腿”起步价
+    if( kg_number>=11 ) uupaotui_init_price += (kg_number-10)*2
+    for(let i=0; i<5; i++){
+        uupaotui[i] = uupaotui_init_price
+    }
+    for(let i=5; i<50; i++){
+        uupaotui[i] = uupaotui_init_price + (i-4)*2
+    }
+    console.log('uu跑腿起步价',uupaotui_init_price)
+    console.log('uu跑腿',uupaotui)
+    
+    // 初始化“美团”起步价
+    if( kg_number>=6 && kg_number<11 ) {
+        meituan_init_price += 6 
+    }else if( kg_number>10 ) {
+        meituan_init_price += 10
+    }
+    for(let i=0; i<3; i++){
+        meituan[i] = meituan_init_price + (i+1)*1
+    }
+    for(let i=3; i<6; i++){
+        meituan[i] = meituan_init_price + 3 + (i-2)*2
+    }
+    for(let i=6; i<10; i++){
+        meituan[i] = meituan_init_price + 3 + 6 + (i-5)*3
+    }
+    for(let i=10; i<16; i++){
+        meituan[i] = meituan_init_price + 3 + 6 + 12 + Math.ceil((i-9)/3)*3
+    }
+    for(let i=16; i<28; i++){
+        meituan[i] = meituan_init_price + 3 + 6 + 12 + 6 + Math.ceil((i-15)/3)*6
+    }
+    for(let i=28; i<30; i++){
+        meituan[i] = meituan_init_price + 57
+    }
+    for(let i=30; i<35; i++){
+        meituan[i] = meituan_init_price + 57 + (i+1-30)*1
+    }
+    for(let i=35; i<50; i++){
+        meituan[i] = meituan_init_price + 57 + 5 + (i-34)*2
+    }
+    console.log('美团起步价',meituan_init_price)
+    console.log('美团',meituan)
+
+
+    // 初始化“饿了么”起步价
+    if( kg_number >=6 ) eleme_init_price += (kg_number-5)*2
+    eleme[0] = eleme_init_price
+    for(let i=1; i<20; i++){
+        eleme[i] = eleme_init_price + (i-1)*2
+    }
+    for(let i=20; i<50; i++){
+        eleme[i] = eleme_init_price + 40 + (i-19)*3
+    }
+    console.log('饿了么起步价',eleme_init_price)
+    console.log('饿了么',eleme)
+    
+
+
+}
+       </script>
+   </body>
+</html>
